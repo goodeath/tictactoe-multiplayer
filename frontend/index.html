@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <title>TicTacToe</title>
+</head>
+
+<body>
+    <div class="center">
+        <div class="board">
+            <div class="point" data-row="0" data-col="0">&nbsp;</div>
+            <div class="point" data-row="0" data-col="1">&nbsp;</div>
+            <div class="point" data-row="0" data-col="2">&nbsp;</div>
+            <div class="point" data-row="1" data-col="0">&nbsp;</div>
+            <div class="point" data-row="1" data-col="1">&nbsp;</div>
+            <div class="point" data-row="1" data-col="2">&nbsp;</div>
+            <div class="point" data-row="2" data-col="0">&nbsp;</div>
+            <div class="point" data-row="2" data-col="1">&nbsp;</div>
+            <div class="point" data-row="2" data-col="2">&nbsp;</div>
+        </div>
+        <input type="submit" value="Send message" type="button" onClick="start()">
+    </div>
+
+    <!--
+        Javascript that is used to Connect to Websocket and Handle New messages
+    -->
+    <script type="text/javascript">
+        const ws = new WebSocket("ws://127.0.0.1:8080/ws");
+
+        // selectedchat is by default General.
+        var selectedchat = "general";
+
+        /**
+         * changeChatRoom will update the value of selectedchat
+         * and also notify the server that it changes chatroom
+         * */
+        function changeChatRoom() {
+            // Change Header to reflect the Changed chatroom
+            var newchat = document.getElementById("chatroom");
+            if (newchat != null && newchat.value != selectedchat) {
+                console.log(newchat);
+            }
+            return false;
+        }
+        /**
+         * sendMessage will send a new message onto the Websocket
+         * */
+        function sendMessage() {
+            var newmessage = document.getElementById("message");
+            if (newmessage != null) {
+                console.log(newmessage);
+            }
+            return false;
+        }
+        let last;
+        ws.onmessage = function(evt){
+            console.log(evt)
+            if(evt.data == 'Not allowed'){
+                if(last) last.html('')
+                alert('Espere sua vez de jogar')
+            }
+            else {
+                const payload = JSON.parse(evt.data);
+                $($(".point")[payload.payload.PosX*3+ payload.payload.PosY]).html("O")
+            }               
+        }
+        const ChoiceHandler = function(evt) {
+            console.log(this)
+            last = $(this);
+            $(this).html("X");
+            const {row: PosX, col: PosY} = this.dataset;
+            console.log(PosX,PosY);
+            ws.send(JSON.stringify({
+                type: "player_move",
+                payload: { PosX:+PosX, PosY:+PosY }
+            }))
+        }
+        $(document).ready(function(){
+            $('.point').click(ChoiceHandler);
+        })
+        /**
+         * Once the website loads, we want to apply listeners and connect to websocket
+         * */
+        window.onload = function () {
+            // Apply our listener functions to the submit event on both forms
+            // we do it this way to avoid redirects
+
+            // Check if the browser supports WebSocket
+        	if (window["WebSocket"]) {
+                console.log("supports websockets");
+            } else {
+                alert("Not supporting websockets");
+            }};
+    </script>
+
+    <style type="text/css">
+        .board {
+            background: #ddd;
+            width: 600px;
+            height: 600px;
+            margin: 5rem auto;
+            display: flex;
+            flex-wrap: wrap
+        }
+        .point {
+            border: 1px solid black;
+            width:195px;
+            height:195px;
+            font-size: 5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: rgb(66, 56, 56);
+        }
+
+    </style>
+    <script>
+
+        /*const start = () => {
+            a = new WebSocket("ws://127.0.0.1:8080/ws")
+            b = new WebSocket("ws://127.0.0.1:8080/ws")
+            setTimeout(async() => {
+                a.send(JSON.stringify({
+                    type: 'player_move',
+                    payload: {PosX:0,PosY:0}
+                }))
+                await new Promise((res,rej) => setTimeout(res,1000))
+                b.send(JSON.stringify({
+                    type: 'player_move',
+                    payload: {PosX:1,PosY:0}
+                }))
+                await new Promise((res,rej) => setTimeout(res,1000))
+                a.send(JSON.stringify({
+                    type: 'player_move',
+                    payload: {PosX:0,PosY:1}
+                }))
+                await new Promise((res,rej) => setTimeout(res,1000))
+                b.send(JSON.stringify({
+                    type: 'player_move',
+                    payload: {PosX:1,PosY:1}
+                }))
+                await new Promise((res,rej) => setTimeout(res,1000))
+
+                a.send(JSON.stringify({
+                    type: 'player_move',
+                    payload: {PosX:0,PosY:2}
+                }))
+            }, 1000)
+        }*/
+    </script>
+
+</body>
+
+</html>
