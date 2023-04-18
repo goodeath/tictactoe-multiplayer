@@ -18,13 +18,15 @@ func NewBoard() *Board {
 	return &Board{
 		player1: Player1,
 		player2: Player2,
+		points: [3][3]FlagPlayer{},
+
 	}
 }
 
 func (b *Board) CheckWinner() FlagPlayer {
 	winner := NoWin
-	for i := 0; i < 3 && winner==0; i++ {
-		for j := 0; j < 3 && winner==0; j++ {
+	for i := 0; i < 3 && winner == NoWin; i++ {
+		for j := 0; j < 3 && winner == NoWin; j++ {
 			switch {
 			case i == 0:
 				winner = b.checkColumn(j)
@@ -41,7 +43,7 @@ func (b *Board) CheckWinner() FlagPlayer {
 func (board *Board) checkColumn(column int) FlagPlayer {
 	win_one, win_two :=  true, true
 	for i := 0; i < 3; i++ {
-		colValue := board.points[i][column]
+		colValue := board.points[column][i]
 		if colValue == Player1 { 
 			win_two = false
 		} else if colValue == Player2 { 
@@ -63,7 +65,7 @@ func (board *Board) checkColumn(column int) FlagPlayer {
 func (board *Board) checkRow(row int) FlagPlayer {
 	win_one, win_two :=  true, true
 	for i := 0; i < 3; i++ {
-		colValue := board.points[row][i]
+		colValue := board.points[i][row]
 		if colValue == Player1 { 
 			win_two = false
 		} else if colValue == Player2 { 
