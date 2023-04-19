@@ -43,6 +43,10 @@ func (player *NetworkPlayer) PlayTurn(posx int, posy int) {
 	player.game.PlayTurn(posx, posy)
 }
 
+func (player *NetworkPlayer) IsMatchStarted() bool {
+	return !player.game.IsAvailable() 
+}
+
 func (player *NetworkPlayer) disconnect() {
 	player.server.Disconnect(player)
 }

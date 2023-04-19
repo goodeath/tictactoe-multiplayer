@@ -14,6 +14,12 @@ func HandlerPlayerMove(event Event, client *NetworkPlayer) error {
 		client.data <- []byte("Not allowed")
 		return nil
 	}
+	
+	if !client.IsMatchStarted() {
+		client.data <- []byte(`{"type": "error", "payload": { "message": "Partida ainda não começou"}}`);
+		return nil
+	}
+
 	var payload PlayerMoveEvent
 	if err := json.Unmarshal(event.Payload, &payload); err != nil {
 		log.Println("Error decoding JSON: %v", err)
